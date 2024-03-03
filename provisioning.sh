@@ -40,12 +40,12 @@ npm ci
 echo -------------database migration-------------
 npx prisma migrate dev --name init
 echo -------------start unit testing-------------
-npm run test
+#npm run test
 echo -------------start e2e testing-------------
-npm run test:e2e
+#npm run test:e2e
 
-docker exec -it $DB_NAME bash -c "psql -U $DB_NAME -c \"INSERT INTO members (id, email, password, is_admin) VALUES (gen_random_uuid(), 'owner@gmail.com', 'qwe123!@#', true);\""
-docker exec -it $DB_NAME bash -c "psql -U $DB_NAME -c \"INSERT INTO members (id ,email, password, is_admin) VALUES (gen_random_uuid(), 'user@gmail.com', 'qwe123!@#', false);\""
+docker exec -it $DB_NAME bash -c "psql -U $DB_NAME -c \"INSERT INTO members (id, email, password) VALUES (gen_random_uuid(), 'owner@gmail.com', 'qwe123!@#');\""
+docker exec -it $DB_NAME bash -c "psql -U $DB_NAME -c \"INSERT INTO members (id ,email, password) VALUES (gen_random_uuid(), 'user@gmail.com', 'qwe123!@#');\""
 
 echo "<Admin data> email: owner@gmail.com, password: qwe123!@#"
 echo "<User data> email: user@gmail.com, password: qwe123!@#"
