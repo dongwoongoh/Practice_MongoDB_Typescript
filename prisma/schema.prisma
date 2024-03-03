@@ -8,13 +8,56 @@ datasource db {
 }
 
 model Members {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  isAdmin   Boolean  @default(false) @map("is_admin")
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  cash          Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt @default(now())
   deletedAt     DateTime?
+  participations UserQuestionParticipations[]
+  transactions  CashTransactions[]
   @@map("members")
 }
+
+model Questions {
+  id            Int      @id @default(autoincrement())
+  title         String
+  answer        String
+  mid           String
+  quantity      Int
+  type          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt @default(now())
+  deletedAt     DateTime?
+  participations UserQuestionParticipations[]
+  @@map("questions")
+}
+
+model UserQuestionParticipations {
+  id                  Int      @id @default(autoincrement())
+  userId              Int
+  questionId          Int
+  participationDateTime DateTime
+  member              Members     @relation(fields: [userId], references: [id])
+  question            Questions @relation(fields: [questionId], references: [id])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt @default(now())
+  deletedAt           DateTime?
+  @@map("user_question_participations")
+}
+
+model CashTransactions {
+  id                  Int      @id @default(autoincrement())
+  userId              Int
+  amount              Int
+  transactionDateTime DateTime
+  description         String?
+  member              Members     @relation(fields: [userId], references: [id])
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt @default(now())
+  deletedAt           DateTime?
+  @@map("cash_transactions")
+}
+
 
