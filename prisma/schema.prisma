@@ -8,12 +8,12 @@ datasource db {
 }
 
 model Members {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
+  id            String      @id @default(uuid())
+  email         String      @unique
   password      String
-  cash          Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt @default(now())
+  cash          Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt @default(now())
   deletedAt     DateTime?
   participations UserQuestionParticipations[]
   transactions  CashTransactions[]
@@ -21,41 +21,41 @@ model Members {
 }
 
 model Questions {
-  id            Int      @id @default(autoincrement())
+  id            String      @id @default(uuid())
   title         String
   answer        String
   mid           String
   quantity      Int
   type          String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt @default(now())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt @default(now())
   deletedAt     DateTime?
   participations UserQuestionParticipations[]
   @@map("questions")
 }
 
 model UserQuestionParticipations {
-  id                  Int      @id @default(autoincrement())
-  userId              Int
-  questionId          Int
+  id                  String      @id @default(uuid())
+  userId              String
+  questionId          String
   participationDateTime DateTime
   member              Members     @relation(fields: [userId], references: [id])
-  question            Questions @relation(fields: [questionId], references: [id])
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt @default(now())
+  question            Questions   @relation(fields: [questionId], references: [id])
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt @default(now())
   deletedAt           DateTime?
   @@map("user_question_participations")
 }
 
 model CashTransactions {
-  id                  Int      @id @default(autoincrement())
-  userId              Int
+  id                  String      @id @default(uuid())
+  userId              String
   amount              Int
   transactionDateTime DateTime
   description         String?
   member              Members     @relation(fields: [userId], references: [id])
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt @default(now())
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt @default(now())
   deletedAt           DateTime?
   @@map("cash_transactions")
 }
