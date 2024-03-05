@@ -12,9 +12,9 @@ model Members {
   email         String      @unique
   password      String
   cash          Int         @default(0)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt @default(now())
-  deletedAt     DateTime?
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt @default(now())
+  deleted_at     DateTime?
   participations UserQuestionParticipations[]
   transactions  CashTransactions[]
   @@map("members")
@@ -27,9 +27,9 @@ model Questions {
   mid           String
   quantity      Int
   type          String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt @default(now())
-  deletedAt     DateTime?
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt @default(now())
+  deleted_at     DateTime?
   participations UserQuestionParticipations[]
   @@map("questions")
 }
@@ -41,9 +41,9 @@ model UserQuestionParticipations {
   participationDateTime DateTime
   member              Members     @relation(fields: [userId], references: [id])
   question            Questions   @relation(fields: [questionId], references: [id])
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt @default(now())
-  deletedAt           DateTime?
+  created_at           DateTime    @default(now())
+  updated_at           DateTime    @updatedAt @default(now())
+  deleted_at           DateTime?
   @@map("user_question_participations")
 }
 
@@ -54,9 +54,9 @@ model CashTransactions {
   transactionDateTime DateTime
   description         String?
   member              Members     @relation(fields: [userId], references: [id])
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt @default(now())
-  deletedAt           DateTime?
+  created_at           DateTime    @default(now())
+  updated_at           DateTime    @updatedAt @default(now())
+  deleted_at           DateTime?
   @@map("cash_transactions")
 }
 
