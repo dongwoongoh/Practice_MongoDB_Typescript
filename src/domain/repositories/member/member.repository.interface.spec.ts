@@ -84,9 +84,9 @@ describe('member repository interface', () => {
     });
 
     describe('update', () => {
+        type UpdateFields = Pick<Member, 'email' | 'password' | 'cash'>;
+        type Update = Partial<UpdateFields>;
         describe('success', () => {
-            type UpdateFields = Pick<Member, 'email' | 'password' | 'cash'>;
-            type Update = Partial<UpdateFields>;
             it('should update all fields', async () => {
                 const data: Update = {
                     email: 'changed_email@gmail.com',
@@ -112,10 +112,24 @@ describe('member repository interface', () => {
                 expect(member.password).toStrictEqual(mock_member.password);
                 expect(member.cash).toStrictEqual(mock_member.cash);
             });
-            it('should update password', async () => {});
-            it('should update cash', async () => {});
+            it('should update password', async () => {
+                const data: Update = { password: 'update_password_only' };
+                const member = await mock_repository.update<UpdateFields>(
+                    mock_member.id,
+                    data,
+                );
+                expect(member.password).toStrictEqual(data.password);
+                expect(member.email).toStrictEqual(mock_member.email);
+                expect(member.cash).toStrictEqual(mock_member.cash);
+            });
         });
-        it('failed', async () => {});
+        it('failed', async () => {
+            await expect(async () => {
+                await mock_repository.update<UpdateFields>('failed_uuid', {
+                    email: 'failed_email@test.com',
+                });
+            }).rejects.toThrowError(new Error('404_id'));
+        });
     });
 
     describe('deleteSoftById', () => {
