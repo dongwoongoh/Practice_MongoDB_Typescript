@@ -84,7 +84,37 @@ describe('member repository interface', () => {
     });
 
     describe('update', () => {
-        it('success', async () => {});
+        describe('success', () => {
+            type UpdateFields = Pick<Member, 'email' | 'password' | 'cash'>;
+            type Update = Partial<UpdateFields>;
+            it('should update all fields', async () => {
+                const data: Update = {
+                    email: 'changed_email@gmail.com',
+                    password: 'changed_password',
+                    cash: 1000,
+                };
+                const member = await mock_repository.update<UpdateFields>(
+                    mock_member.id,
+                    data,
+                );
+                expect(mock_member.id).toStrictEqual(member.id);
+                expect(member.email).toStrictEqual(data.email);
+                expect(member.password).toStrictEqual(data.password);
+                expect(member.cash).toStrictEqual(data.cash);
+            });
+            it('should update email', async () => {
+                const data: Update = { email: 'changed_email_only@gmailc.om' };
+                const member = await mock_repository.update<UpdateFields>(
+                    mock_member.id,
+                    data,
+                );
+                expect(member.email).toStrictEqual(data.email);
+                expect(member.password).toStrictEqual(mock_member.password);
+                expect(member.cash).toStrictEqual(mock_member.cash);
+            });
+            it('should update password', async () => {});
+            it('should update cash', async () => {});
+        });
         it('failed', async () => {});
     });
 
