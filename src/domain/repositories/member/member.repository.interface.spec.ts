@@ -133,7 +133,18 @@ describe('member repository interface', () => {
     });
 
     describe('deleteSoftById', () => {
-        it('success', async () => {});
-        it('failed', async () => {});
+        it('success', async () => {
+            const result = await mock_repository.deleteSoftById<{
+                code: number;
+            }>('mock_uuid');
+            expect(result.code).toStrictEqual(201);
+        });
+        it('failed', async () => {
+            await expect(async () => {
+                await mock_repository.deleteSoftById<{ code: number }>(
+                    'failed_uuid',
+                );
+            }).rejects.toThrowError(new Error('404_id'));
+        });
     });
 });
