@@ -1,4 +1,8 @@
-import { Injectable, Scope } from '@nestjs/common';
+import {
+    Injectable,
+    Scope,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { MemberRepositoryInterface } from '@/domain/repositories/member/member.repository.interface';
 import { Member } from '@/domain/entities/member/member';
 import { PrismaService } from '@/infrastructure/services/prisma.service';
@@ -15,6 +19,25 @@ export class MemberRepository implements MemberRepositoryInterface {
     }
 
     public async insert(email: string, password: string): Promise<Member> {
+        const check_email = await this.prisma.members.findUnique({
+            where: { email },
+        });
+        if (check_email) throw new UnprocessableEntityException(email);
+        try {
+            const member = await this.prisma.$transaction(
+                async (tx) =>
+                    await tx.members.create({ data: { email, password } }),
+            );
+            return new Member(
+                member.id,
+                member.email,
+                member.password,
+                member.cash,
+                member.created_at,
+                member.updated_at,
+                member.deleted_at,
+            );
+        } catch (e) {}
         return Promise.resolve(undefined);
     }
 
