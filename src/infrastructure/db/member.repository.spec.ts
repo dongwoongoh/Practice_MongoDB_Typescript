@@ -1,6 +1,7 @@
 import { PrismaService } from '@/infrastructure/services/prisma.service';
 import { MemberRepository } from '@/infrastructure/db/member.repository';
 import { Member } from '@/domain/entities/member/member';
+import { UnprocessableEntityException } from '@nestjs/common';
 
 jest.mock('@/infrastructure/services/prisma.service', () => ({
     PrismaService: jest.fn().mockImplementation(() => ({
@@ -60,6 +61,25 @@ describe('member repository', () => {
             expect(create).toHaveBeenCalled();
             expect(create).toBeCalledTimes(1);
         });
-        it('should failed because 422 email', async () => {});
+        it('should failed because 422 email', async () => {
+            const error = new Error(email);
+            jest.mocked(
+                mockPrismaService.members.findUnique,
+            ).mockResolvedValueOnce({
+                id,
+                email,
+                cash,
+                password,
+                created_at,
+                updated_at,
+                deleted_at,
+            });
+            jest.mocked(mockPrismaService.members.create).mockRejectedValueOnce(
+                error,
+            );
+            await expect(async () => {
+                await repository.insert(email, password);
+            }).rejects.toThrowError(new Error(email));
+        });
     });
 });

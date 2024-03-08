@@ -22,7 +22,7 @@ export class MemberRepository implements MemberRepositoryInterface {
         const check_email = await this.prisma.members.findUnique({
             where: { email },
         });
-        if (check_email) throw new UnprocessableEntityException(email);
+        if (check_email) throw new Error(email);
         try {
             const member = await this.prisma.$transaction(
                 async (tx) =>
