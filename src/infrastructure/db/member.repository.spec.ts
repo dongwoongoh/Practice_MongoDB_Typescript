@@ -1,7 +1,6 @@
 import { PrismaService } from '@/infrastructure/services/prisma.service';
 import { MemberRepository } from '@/infrastructure/db/member.repository';
 import { Member } from '@/domain/entities/member/member';
-import { UnprocessableEntityException } from '@nestjs/common';
 
 jest.mock('@/infrastructure/services/prisma.service', () => ({
     PrismaService: jest.fn().mockImplementation(() => ({

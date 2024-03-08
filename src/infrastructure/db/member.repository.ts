@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    Scope,
-    UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { MemberRepositoryInterface } from '@/domain/repositories/member/member.repository.interface';
 import { Member } from '@/domain/entities/member/member';
 import { PrismaService } from '@/infrastructure/services/prisma.service';
@@ -37,8 +33,9 @@ export class MemberRepository implements MemberRepositoryInterface {
                 member.updated_at,
                 member.deleted_at,
             );
-        } catch (e) {}
-        return Promise.resolve(undefined);
+        } catch (e) {
+            if (e instanceof Error) throw new Error(e.message);
+        }
     }
 
     public async update<T>(id: string, data: Partial<T>): Promise<Member> {
