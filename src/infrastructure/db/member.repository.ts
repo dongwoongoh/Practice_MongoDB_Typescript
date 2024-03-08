@@ -11,7 +11,17 @@ export class MemberRepository implements MemberRepositoryInterface {
     }
 
     public async findOneById(id: string): Promise<Member> {
-        return Promise.resolve(undefined);
+        const member = await this.prisma.members.findUnique({ where: { id } });
+        if (!member) throw new Error(id);
+        return new Member(
+            member.id,
+            member.email,
+            member.password,
+            member.cash,
+            member.created_at,
+            member.updated_at,
+            member.deleted_at,
+        );
     }
 
     public async insert(email: string, password: string): Promise<Member> {

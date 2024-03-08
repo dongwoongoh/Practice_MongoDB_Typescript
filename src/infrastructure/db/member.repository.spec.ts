@@ -19,14 +19,14 @@ describe('member repository', () => {
         mockPrismaService = new PrismaService() as jest.Mocked<PrismaService>;
         repository = new MemberRepository(mockPrismaService);
     });
+    const id = 'mock_uuid';
+    const email = 'mock@gmail.com';
+    const password = 'mock_password';
+    const cash = 0;
+    const created_at = new Date();
+    const updated_at = new Date();
+    const deleted_at = null;
     describe('insert', () => {
-        const id = 'mock_uuid';
-        const email = 'mock@gmail.com';
-        const password = 'mock_password';
-        const cash = 0;
-        const created_at = new Date();
-        const updated_at = new Date();
-        const deleted_at = null;
         it('success', async () => {
             const transaction = jest
                 .mocked(mockPrismaService.$transaction)
@@ -80,5 +80,25 @@ describe('member repository', () => {
                 await repository.insert(email, password);
             }).rejects.toThrowError(new Error(email));
         });
+    });
+
+    describe('findById', () => {
+        it('success', async () => {
+            const findUnique = jest
+                .mocked(mockPrismaService.members.findUnique)
+                .mockResolvedValueOnce({
+                    id,
+                    email,
+                    password,
+                    cash,
+                    created_at,
+                    updated_at,
+                    deleted_at,
+                });
+            const member = await repository.findOneById(id);
+            expect(member.id).toStrictEqual(id);
+            expect(findUnique).toHaveBeenCalledTimes(1);
+        });
+        it('failed', async () => {});
     });
 });
