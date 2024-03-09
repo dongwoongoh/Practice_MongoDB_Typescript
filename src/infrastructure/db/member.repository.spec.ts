@@ -99,6 +99,14 @@ describe('member repository', () => {
             expect(member.id).toStrictEqual(id);
             expect(findUnique).toHaveBeenCalledTimes(1);
         });
-        it('failed', async () => {});
+        it('failed', async () => {
+            const error = new Error(id);
+            jest.mocked(
+                mockPrismaService.members.findUnique,
+            ).mockRejectedValueOnce(error);
+            await expect(async () => {
+                await repository.findOneById(id);
+            }).rejects.toThrowError(new Error(id));
+        });
     });
 });
