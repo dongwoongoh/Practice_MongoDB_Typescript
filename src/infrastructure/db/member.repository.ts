@@ -2,6 +2,7 @@ import { Injectable, Scope } from '@nestjs/common';
 import { MemberRepositoryInterface } from '@/domain/repositories/member/member.repository.interface';
 import { Member } from '@/domain/entities/member/member';
 import { PrismaService } from '@/infrastructure/services/prisma.service';
+import { MemberUpdate } from '@/domain/services/member/member.update';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class MemberRepository implements MemberRepositoryInterface {
@@ -48,7 +49,26 @@ export class MemberRepository implements MemberRepositoryInterface {
         }
     }
 
-    public async update<T>(id: string, data: Partial<T>): Promise<Member> {
-        return Promise.resolve(undefined);
+    public async update(id: string, data: MemberUpdate): Promise<Member> {
+        const find = await this.prisma.members.findUnique({
+            where: { id },
+        });
+        if (!find) throw new Error(id);
+        try {
+            const member = await this.prisma.$transaction(
+                async (tx) => await tx.members.update({ where: { id }, data }),
+            );
+            return new Member(
+                member.id,
+                member.email,
+                member.password,
+                member.cash,
+                member.created_at,
+                member.updated_at,
+                member.deleted_at,
+            );
+        } catch (e) {
+            if (e instanceof Error) throw new Error(e.message);
+        }
     }
 }

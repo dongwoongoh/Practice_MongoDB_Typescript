@@ -1,5 +1,6 @@
 import { MemberRepositoryInterface } from '@/domain/repositories/member/member.repository.interface';
 import { Member } from '@/domain/entities/member/member';
+import { MemberUpdate } from '@/domain/services/member/member.update';
 
 describe('member repository interface', () => {
     let mock_repository: MemberRepositoryInterface;
@@ -35,20 +36,18 @@ describe('member repository interface', () => {
             }),
             update: jest
                 .fn()
-                .mockImplementation(
-                    async (id: string, data: Partial<Member>) => {
-                        if (mock_member.id !== id) throw new Error('404_id');
-                        return new Member(
-                            id,
-                            data.email || mock_member.email,
-                            data.password || mock_member.password,
-                            data.cash || mock_member.cash,
-                            new Date(),
-                            new Date(),
-                            null,
-                        );
-                    },
-                ),
+                .mockImplementation(async (id: string, data: MemberUpdate) => {
+                    if (mock_member.id !== id) throw new Error('404_id');
+                    return new Member(
+                        id,
+                        data.email || mock_member.email,
+                        data.password || mock_member.password,
+                        data.cash || mock_member.cash,
+                        new Date(),
+                        new Date(),
+                        null,
+                    );
+                }),
             deleteSoftById: jest.fn().mockImplementation(async (id: string) => {
                 if (mock_member.id !== id) throw new Error('404_id');
                 return { code: 201 };
@@ -84,16 +83,14 @@ describe('member repository interface', () => {
     });
 
     describe('update', () => {
-        type UpdateFields = Pick<Member, 'email' | 'password' | 'cash'>;
-        type Update = Partial<UpdateFields>;
         describe('success', () => {
             it('should update all fields', async () => {
-                const data: Update = {
+                const data: MemberUpdate = {
                     email: 'changed_email@gmail.com',
                     password: 'changed_password',
                     cash: 1000,
                 };
-                const member = await mock_repository.update<UpdateFields>(
+                const member = await mock_repository.update(
                     mock_member.id,
                     data,
                 );
@@ -103,8 +100,10 @@ describe('member repository interface', () => {
                 expect(member.cash).toStrictEqual(data.cash);
             });
             it('should update email', async () => {
-                const data: Update = { email: 'changed_email_only@gmailc.om' };
-                const member = await mock_repository.update<UpdateFields>(
+                const data: MemberUpdate = {
+                    email: 'changed_email_only@gmailc.om',
+                };
+                const member = await mock_repository.update(
                     mock_member.id,
                     data,
                 );
@@ -113,8 +112,8 @@ describe('member repository interface', () => {
                 expect(member.cash).toStrictEqual(mock_member.cash);
             });
             it('should update password', async () => {
-                const data: Update = { password: 'update_password_only' };
-                const member = await mock_repository.update<UpdateFields>(
+                const data: MemberUpdate = { password: 'update_password_only' };
+                const member = await mock_repository.update(
                     mock_member.id,
                     data,
                 );
@@ -125,7 +124,7 @@ describe('member repository interface', () => {
         });
         it('failed', async () => {
             await expect(async () => {
-                await mock_repository.update<UpdateFields>('failed_uuid', {
+                await mock_repository.update('failed_uuid', {
                     email: 'failed_email@test.com',
                 });
             }).rejects.toThrowError(new Error('404_id'));
