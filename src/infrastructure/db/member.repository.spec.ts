@@ -1,12 +1,14 @@
 import { PrismaService } from '@/infrastructure/services/prisma.service';
 import { MemberRepository } from '@/infrastructure/db/member.repository';
 import { Member } from '@/domain/entities/member/member';
+import { MemberUpdate } from '@/domain/services/member/member.update';
 
 jest.mock('@/infrastructure/services/prisma.service', () => ({
     PrismaService: jest.fn().mockImplementation(() => ({
         members: {
             findUnique: jest.fn(),
             create: jest.fn(),
+            update: jest.fn(),
         },
         $transaction: jest.fn(),
     })),
@@ -106,6 +108,141 @@ describe('member repository', () => {
             ).mockRejectedValueOnce(error);
             await expect(async () => {
                 await repository.findOneById(id);
+            }).rejects.toThrowError(new Error(id));
+        });
+    });
+
+    describe('update', () => {
+        describe('success', () => {
+            it('should updated all fields', async () => {
+                const data: MemberUpdate = {
+                    email: 'update_email@gmail.com',
+                    password: 'update_password',
+                    cash: 77,
+                };
+                jest.mocked(mockPrismaService.$transaction).mockImplementation(
+                    async (transactionCallback) =>
+                        transactionCallback(mockPrismaService),
+                );
+                jest.mocked(
+                    mockPrismaService.members.findUnique,
+                ).mockResolvedValueOnce({
+                    id,
+                    email,
+                    password,
+                    cash,
+                    created_at,
+                    updated_at,
+                    deleted_at,
+                });
+                jest.mocked(
+                    mockPrismaService.members.update,
+                ).mockResolvedValueOnce({
+                    id,
+                    email: data.email || email,
+                    password: data.password || password,
+                    cash: data.cash || cash,
+                    created_at,
+                    updated_at: new Date(),
+                    deleted_at: null,
+                });
+                const member = await repository.update(id, data);
+                expect(member.id).toStrictEqual(id);
+                expect(member.email).toStrictEqual(data.email);
+                expect(member.id === id).toBeTruthy();
+                expect(member.email !== email).toBeTruthy();
+                expect(member.password !== password).toBeTruthy();
+                expect(member.cash !== cash).toBeTruthy();
+            });
+            it('should updated only email', async () => {
+                const data: MemberUpdate = {
+                    email: 'update_email@gmail.com',
+                };
+                jest.mocked(mockPrismaService.$transaction).mockImplementation(
+                    async (transactionCallback) =>
+                        transactionCallback(mockPrismaService),
+                );
+                jest.mocked(
+                    mockPrismaService.members.findUnique,
+                ).mockResolvedValueOnce({
+                    id,
+                    email,
+                    password,
+                    cash,
+                    created_at,
+                    updated_at,
+                    deleted_at,
+                });
+                jest.mocked(
+                    mockPrismaService.members.update,
+                ).mockResolvedValueOnce({
+                    id,
+                    email: data.email || email,
+                    password: data.password || password,
+                    cash: data.cash || cash,
+                    created_at,
+                    updated_at: new Date(),
+                    deleted_at: null,
+                });
+                const member = await repository.update(id, data);
+                expect(member.id).toStrictEqual(id);
+                expect(member.email).toStrictEqual(data.email);
+                expect(member.id === id).toBeTruthy();
+                expect(member.email !== email).toBeTruthy();
+                expect(member.password === password).toBeTruthy();
+                expect(member.cash === cash).toBeTruthy();
+            });
+            it('should updated only password', async () => {
+                const data: MemberUpdate = {
+                    password: 'update_password',
+                };
+                jest.mocked(mockPrismaService.$transaction).mockImplementation(
+                    async (transactionCallback) =>
+                        transactionCallback(mockPrismaService),
+                );
+                jest.mocked(
+                    mockPrismaService.members.findUnique,
+                ).mockResolvedValueOnce({
+                    id,
+                    email,
+                    password,
+                    cash,
+                    created_at,
+                    updated_at,
+                    deleted_at,
+                });
+                jest.mocked(
+                    mockPrismaService.members.update,
+                ).mockResolvedValueOnce({
+                    id,
+                    email: data.email || email,
+                    password: data.password || password,
+                    cash: data.cash || cash,
+                    created_at,
+                    updated_at: new Date(),
+                    deleted_at: null,
+                });
+                const member = await repository.update(id, data);
+                expect(member.id).toStrictEqual(id);
+                expect(member.password).toStrictEqual(data.password);
+                expect(member.id === id).toBeTruthy();
+                expect(member.email === email).toBeTruthy();
+                expect(member.password !== password).toBeTruthy();
+                expect(member.cash === cash).toBeTruthy();
+            });
+        });
+        it('failed', async () => {
+            const error = new Error(id);
+            jest.mocked(
+                mockPrismaService.members.findUnique,
+            ).mockRejectedValueOnce(error);
+            const data: MemberUpdate = {
+                email: 'update_email@gmail.com',
+                password: 'update_password',
+                cash: 77,
+            };
+            await expect(async () => {
+                await repository.update(id, data);
             }).rejects.toThrowError(new Error(id));
         });
     });
