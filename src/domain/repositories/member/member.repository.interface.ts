@@ -5,5 +5,5 @@ export interface MemberRepositoryInterface {
     readonly insert: (email: string, password: string) => Promise<Member>;
     readonly findOneById: (id: string) => Promise<Member>;
     readonly update: (id: string, data: MemberUpdate) => Promise<Member>;
-    readonly deleteSoftById: <K>(id: string) => Promise<K>;
+    readonly deleteSoftById: (id: string) => Promise<Member>;
 }

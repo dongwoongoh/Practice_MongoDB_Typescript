@@ -43,14 +43,22 @@ describe('member repository interface', () => {
                         data.email || mock_member.email,
                         data.password || mock_member.password,
                         data.cash || mock_member.cash,
-                        new Date(),
+                        mock_member.createdAt,
                         new Date(),
                         null,
                     );
                 }),
             deleteSoftById: jest.fn().mockImplementation(async (id: string) => {
                 if (mock_member.id !== id) throw new Error('404_id');
-                return { code: 201 };
+                return new Member(
+                    id,
+                    mock_member.email,
+                    mock_member.password,
+                    mock_member.cash,
+                    mock_member.createdAt,
+                    mock_member.updatedAt,
+                    new Date(),
+                );
             }),
         };
     });
@@ -133,16 +141,13 @@ describe('member repository interface', () => {
 
     describe('deleteSoftById', () => {
         it('success', async () => {
-            const result = await mock_repository.deleteSoftById<{
-                code: number;
-            }>('mock_uuid');
-            expect(result.code).toStrictEqual(201);
+            const result = await mock_repository.deleteSoftById('mock_uuid');
+            expect(result.id).toStrictEqual(mock_member.id);
+            expect(result.deletedAt !== null).toBeTruthy();
         });
         it('failed', async () => {
             await expect(async () => {
-                await mock_repository.deleteSoftById<{ code: number }>(
-                    'failed_uuid',
-                );
+                await mock_repository.deleteSoftById('failed_uuid');
             }).rejects.toThrowError(new Error('404_id'));
         });
     });
