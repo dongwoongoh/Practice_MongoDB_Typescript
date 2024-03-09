@@ -248,7 +248,49 @@ describe('member repository', () => {
     });
 
     describe('soft delete', () => {
-        it('success', async () => {});
-        it('failed', async () => {});
+        it('success', async () => {
+            jest.mocked(mockPrismaService.$transaction).mockImplementation(
+                async (transactionCallback) =>
+                    transactionCallback(mockPrismaService),
+            );
+            jest.mocked(
+                mockPrismaService.members.findUnique,
+            ).mockResolvedValueOnce({
+                id,
+                email,
+                password,
+                cash,
+                created_at,
+                updated_at,
+                deleted_at,
+            });
+            jest.mocked(mockPrismaService.members.update).mockResolvedValueOnce(
+                {
+                    id,
+                    email,
+                    password,
+                    cash,
+                    created_at,
+                    updated_at,
+                    deleted_at: new Date(),
+                },
+            );
+            const member = await repository.deleteSoftById(id);
+            expect(member.id).toStrictEqual(id);
+            expect(deleted_at === null).toBeTruthy();
+            expect(member.deletedAt !== null).toBeTruthy();
+            expect(member.deletedAt).toBeInstanceOf(Date);
+            expect(deleted_at !== member.deletedAt).toBeTruthy();
+        });
+
+        it('failed', async () => {
+            const error = new Error(id);
+            jest.mocked(
+                mockPrismaService.members.findUnique,
+            ).mockRejectedValueOnce(error);
+            await expect(async () => {
+                await repository.deleteSoftById(id);
+            }).rejects.toThrowError(new Error(id));
+        });
     });
 });
