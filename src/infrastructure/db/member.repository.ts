@@ -7,7 +7,7 @@ import { MemberUpdate } from '@/domain/services/member/member.update';
 @Injectable({ scope: Scope.DEFAULT })
 export class MemberRepository implements MemberRepositoryInterface {
     constructor(private readonly prisma: PrismaService) {}
-    public async deleteSoftById<K>(id: string): Promise<K> {
+    public async deleteSoftById(id: string): Promise<Member> {
         return Promise.resolve(undefined);
     }
 
