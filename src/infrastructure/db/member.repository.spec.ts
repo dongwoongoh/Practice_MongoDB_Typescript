@@ -246,4 +246,9 @@ describe('member repository', () => {
             }).rejects.toThrowError(new Error(id));
         });
     });
+
+    describe('soft delete', () => {
+        it('success', async () => {});
+        it('failed', async () => {});
+    });
 });

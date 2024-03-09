@@ -8,7 +8,30 @@ import { MemberUpdate } from '@/domain/services/member/member.update';
 export class MemberRepository implements MemberRepositoryInterface {
     constructor(private readonly prisma: PrismaService) {}
     public async deleteSoftById(id: string): Promise<Member> {
-        return Promise.resolve(undefined);
+        const find = await this.prisma.members.findUnique({
+            where: { id, deleted_at: null },
+        });
+        if (!find) throw new Error(id);
+        try {
+            const member = await this.prisma.$transaction(
+                async (tx) =>
+                    await tx.members.update({
+                        where: { id },
+                        data: { deleted_at: new Date() },
+                    }),
+            );
+            return new Member(
+                member.id,
+                member.email,
+                member.password,
+                member.cash,
+                member.created_at,
+                member.updated_at,
+                member.deleted_at,
+            );
+        } catch (e) {
+            if (e instanceof Error) throw new Error(e.message);
+        }
     }
 
     public async findOneById(id: string): Promise<Member> {
